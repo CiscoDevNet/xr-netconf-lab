@@ -1,0 +1,30 @@
+version: '3'
+services:
+    influxdb:
+        image: influxdb:1.7.9-alpine
+        environment:
+            - INFLUXDB_DB=telemetry
+            - INFLUXDB_REPORTING_DISABLED=true
+        ports:
+            - 8086
+
+    telegraf:
+        image: telegraf:1.11.5-alpine
+        volumes:
+            - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+        depends_on:
+            - influxdb
+        ports:
+            - 57777:57777
+
+    chronograf:
+        image: chronograf:1.6.2-alpine
+        volumes:
+            - .:/var/lib/chronograf
+        depends_on:
+            - influxdb
+        environment:
+            - REPORTING_DISABLED=true
+        command: --influxdb-url=http://influxdb:8086
+        ports:
+            - 8888:8888
