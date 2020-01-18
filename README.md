@@ -38,6 +38,39 @@ This laboratory assumes the following:
 - the IOS XR is reachable at `198.18.134.72` with username `cisco` and password `cisco`
 - the Linux host has Iperf installed on it
 - the IOS XR has Iperf installed on it
+- the IOS XR has the following configuration:
+  ```
+  telemetry model-driven
+   destination-group DGroup1
+    address-family ipv4 198.18.134.50 port 57777
+     encoding self-describing-gpb
+     protocol grpc no-tls
+    !
+   !
+   sensor-group SGroupGeneric1
+    sensor-path Cisco-IOS-XR-ifmgr-oper:interface-properties/data-nodes/data-node/system-view
+   !
+   subscription Subscription1
+    sensor-group-id SGroupGeneric1 strict-timer
+    sensor-group-id SGroupGeneric1 sample-interval 10000
+    destination-id DGroup1
+   !
+  !
+  tpa
+   vrf default
+    address-family ipv4
+     update-source dataports Loopback0
+    !
+   !
+  !
+  netconf-yang agent
+   ssh
+  !
+  interface Loopback0
+   ipv4 address 1.1.1.1 255.255.255.255
+   shutdown
+  !
+  ```
 
 ## Usage
 
